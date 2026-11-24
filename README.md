@@ -6,9 +6,15 @@ App de produtividade "tudo vinculado": hábitos, bullet journal, notas, sessões
 
 ```bash
 npm install
-npm run dev      # abre em http://localhost:5173
-npm run build    # checa tipos e gera a versão de produção em dist/
+npm run desktop        # app desktop (Tauri) com recarga automática ao editar o código
+npm run desktop:build  # gera o instalador em src-tauri/target/release/bundle/nsis/
+npm run dev            # só no navegador: http://localhost:5173
+npm run build          # checa tipos e gera a versão web em dist/
 ```
+
+O app desktop precisa de [Rust](https://rustup.rs) e do Visual Studio com "Desenvolvimento para desktop com C++" (pré-requisitos do [Tauri](https://tauri.app/start/prerequisites/)).
+
+> **Os dados do app desktop e do navegador são separados.** Cada um tem seu próprio banco local. Para levar dados de um para o outro, use **⋯ → Exportar** num e **Importar** no outro.
 
 ## Como usar
 
@@ -26,6 +32,9 @@ npm run build    # checa tipos e gera a versão de produção em dist/
 ## Estrutura
 
 ```
+src-tauri/                 Casca desktop (Rust/Tauri): janela, ícone, instalador
+  tauri.conf.json          Nome, tamanho da janela, identificador (não mude o
+                           identifier: é ele que define onde os dados ficam salvos)
 src/
   db/db.ts                 Modelo de dados + banco local (IndexedDB via Dexie)
   focus/FocusContext.tsx   Cronômetro global (continua rodando entre janelas)
@@ -50,7 +59,7 @@ No modo dev, o banco fica acessível pelo console do navegador: `await db.habits
 
 1. ✅ MVP: janelas encaixáveis, hábitos, diário, notas, foco + YouTube, gráficos, tópicos, backup
 2. ⬜ Filtro global por tópico (clicar num tópico filtra todas as janelas)
-3. ⬜ App desktop de verdade (Tauri): ícone, janela própria, atalhos globais
+3. ✅ App desktop (Tauri): ícone, janela própria, instalador. ⬜ atalhos globais, bandeja do sistema
 4. ⬜ Google Calendar: eventos do diário ↔ calendário
 5. ⬜ Sincronização em nuvem (Supabase) entre PC e celular
 6. ⬜ Android (Capacitor) + Health Connect para smart band (sono, passos, batimentos)
