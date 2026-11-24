@@ -1,8 +1,30 @@
+import { collides, getCompactor, verticalCompactor } from 'react-grid-layout'
 import { db, type GridItem, type WindowInstance, type WindowKind, type Workspace } from '../db/db'
 import { WINDOW_TYPES } from '../windows/registry'
 import { uid } from './date'
 
 export const GRID_COLS = 24
+
+/**
+ * Modo "Livre": a janela fica onde você soltar, mas só encaixa em espaço
+ * vazio. Não empurra as outras (empurrar em cascata sem compactação gerava
+ * buracos e sobreposições).
+ */
+export const freeCompactor = getCompactor(null, false, true)
+
+export function hasOverlap(layout: readonly GridItem[]): boolean {
+  for (let i = 0; i < layout.length; i++)
+    for (let j = i + 1; j < layout.length; j++) if (collides(layout[i], layout[j])) return true
+  return false
+}
+
+const strip = ({ i, x, y, w, h, minW, minH }: GridItem): GridItem => ({ i, x, y, w, h, minW, minH })
+
+/** Junta as janelas no topo, sem buracos nem sobreposições (mantém a ordem). */
+export async function organizeWorkspace(ws: Workspace) {
+  const layout = verticalCompactor.compact(ws.layout, GRID_COLS).map(strip)
+  await db.workspaces.update(ws.id, { layout })
+}
 
 function win(kind: WindowKind, x: number, y: number, w?: number, h?: number): { window: WindowInstance; item: GridItem } {
   const t = WINDOW_TYPES[kind]

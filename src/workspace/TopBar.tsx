@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { db, type WindowKind, type Workspace } from '../db/db'
-import { addWindow, createWorkspace } from '../lib/workspaces'
+import { addWindow, createWorkspace, organizeWorkspace } from '../lib/workspaces'
 import { WINDOW_TYPES } from '../windows/registry'
 import { useFocus } from '../focus/FocusContext'
 import { formatDuration } from '../lib/date'
@@ -119,6 +119,14 @@ export default function TopBar({ workspaces, active, onSelect }: Props) {
         )}
       </div>
 
+      <button
+        className="chip"
+        onClick={() => organizeWorkspace(active)}
+        title="Junta as janelas no topo, sem buracos nem sobreposições"
+        disabled={active.locked}
+      >
+        ▦ Organizar
+      </button>
       <button
         className={active.snap === 'auto' ? 'chip active' : 'chip'}
         onClick={() => db.workspaces.update(active.id, { snap: active.snap === 'auto' ? 'free' : 'auto' })}

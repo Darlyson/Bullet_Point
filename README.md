@@ -24,7 +24,8 @@ O app desktop precisa de [Rust](https://rustup.rs) e do Visual Studio com "Desen
 - **Redimensionar:** pelas bordas (direita, esquerda, baixo) ou pelo canto inferior direito.
 - **Maximizar:** clique duplo no título (ou no botão □).
 - **+ Janela:** adiciona módulos. Você pode abrir mais de uma janela de Notas, Hábitos etc.
-- **✥ Livre / ⇧ Auto-encaixe:** no modo livre a janela fica onde você soltar. No auto-encaixe as janelas sobem e se empilham sozinhas.
+- **✥ Livre / ⇧ Auto-encaixe:** no modo livre a janela fica onde você soltar, mas só encaixa em espaço vazio: em cima de outra janela, ela volta ao lugar, sem empurrar ninguém. No auto-encaixe as janelas sobem e se empilham sozinhas.
+- **▦ Organizar:** junta todas as janelas no topo, sem buracos nem sobreposições.
 - **🔓 Editar / 🔒 Travado:** trava o layout para não mover nada sem querer.
 - **Abas no topo:** cada aba é um espaço de trabalho (ex.: "Estudo", "Manhã"). Clique duplo renomeia, botão direito exclui.
 - **⋯:** exporta ou importa um backup `.json` de todos os dados.

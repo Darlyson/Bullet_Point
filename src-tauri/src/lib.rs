@@ -1,3 +1,6 @@
+use std::time::Duration;
+use tauri::Manager;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
@@ -8,6 +11,16 @@ pub fn run() {
             .level(log::LevelFilter::Info)
             .build(),
         )?;
+      }
+
+      // A janela começa escondida (tauri.conf.json → visible: false) e o
+      // front-end a mostra assim que desenha a primeira tela. Garantia: se
+      // por algum motivo isso não acontecer, mostra depois de 3 segundos.
+      if let Some(window) = app.get_webview_window("main") {
+        std::thread::spawn(move || {
+          std::thread::sleep(Duration::from_secs(3));
+          let _ = window.show();
+        });
       }
       Ok(())
     })

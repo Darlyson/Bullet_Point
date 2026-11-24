@@ -103,6 +103,19 @@ h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing
 .canvas.interacting iframe { pointer-events: none; }
 .canvas.interacting { user-select: none; }
 
+/*
+ * Desempenho: a biblioteca anima largura/altura/posição em 200ms. Isso faz as
+ * janelas "correrem atrás" ao abrir, redimensionar o app e arrastar.
+ * Aqui só a posição anima (curto, para as janelas empurradas) e nada anima
+ * enquanto o app está sendo redimensionado.
+ */
+.react-grid-layout { transition: none; }
+.react-grid-item,
+.react-grid-item.cssTransforms { transition: transform 120ms ease-out; }
+.no-anim .react-grid-item,
+.react-grid-item.resizing,
+.react-grid-item.react-draggable-dragging { transition: none; }
+
 .react-grid-item.react-grid-placeholder {
   background: var(--accent) !important;
   opacity: 0.18 !important;
@@ -117,6 +130,8 @@ h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing
   border-radius: var(--radius);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
   overflow: hidden;
+  /* isola cada janela: mexer numa não recalcula o layout das outras */
+  contain: layout paint;
 }
 .react-grid-item.react-draggable-dragging .win,
 .react-grid-item.react-draggable-dragging { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6); z-index: 20; }
