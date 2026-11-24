@@ -14,6 +14,8 @@ npm run build          # checa tipos e gera a versão web em dist/
 
 O app desktop precisa de [Rust](https://rustup.rs) e do Visual Studio com "Desenvolvimento para desktop com C++" (pré-requisitos do [Tauri](https://tauri.app/start/prerequisites/)).
 
+> ⚠ No Windows, rode os comandos do desktop pelo **PowerShell** ou CMD, não pelo Git Bash. O comando `link` do Git Bash esconde o `link.exe` da Microsoft e a compilação falha com "link: extra operand".
+
 > **Os dados do app desktop e do navegador são separados.** Cada um tem seu próprio banco local. Para levar dados de um para o outro, use **⋯ → Exportar** num e **Importar** no outro.
 
 ## Como usar
