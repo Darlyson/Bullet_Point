@@ -1,7 +1,7 @@
-import { memo, useCallback, useEffect, useState } from 'react'
-import ReactGridLayout, { useContainerWidth, verticalCompactor, type Layout } from 'react-grid-layout'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import ReactGridLayout, { useContainerWidth, verticalCompactor, type Layout, type LayoutItem } from 'react-grid-layout'
 import { db, type GridItem, type WindowInstance, type Workspace } from '../db/db'
-import { freeCompactor, GRID_COLS, hasOverlap, organizeWorkspace, removeWindow } from '../lib/workspaces'
+import { createFreeCompactor, GRID_COLS, hasOverlap, organizeWorkspace, removeWindow } from '../lib/workspaces'
 import { WINDOW_TYPES } from '../windows/registry'
 
 /**
@@ -88,8 +88,17 @@ export default function WorkspaceCanvas({ ws }: { ws: Workspace }) {
     [wsId],
   )
 
-  const start = () => setInteracting(true)
-  const stop = () => setInteracting(false)
+  // Um por mesa: guarda as posições do início do arraste.
+  const free = useMemo(() => createFreeCompactor(), [])
+
+  const start = (layout: Layout, item: LayoutItem | null) => {
+    if (item) free.begin(layout, item.i)
+    setInteracting(true)
+  }
+  const stop = () => {
+    free.end()
+    setInteracting(false)
+  }
 
   return (
     <div
@@ -108,7 +117,7 @@ export default function WorkspaceCanvas({ ws }: { ws: Workspace }) {
           gridConfig={{ cols: GRID_COLS, rowHeight: 24, margin: [10, 10], containerPadding: [12, 12] }}
           dragConfig={{ enabled: !ws.locked, handle: '.win-header', cancel: '.no-drag' }}
           resizeConfig={{ enabled: !ws.locked, handles: ['se', 'e', 's', 'w'] }}
-          compactor={ws.snap === 'auto' ? verticalCompactor : freeCompactor}
+          compactor={ws.snap === 'auto' ? verticalCompactor : free.compactor}
           onLayoutChange={onLayoutChange}
           onDragStart={start}
           onDragStop={stop}

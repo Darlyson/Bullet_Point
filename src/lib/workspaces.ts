@@ -1,4 +1,4 @@
-import { collides, getCompactor, verticalCompactor } from 'react-grid-layout'
+import { collides, verticalCompactor, type Compactor, type Layout, type LayoutItem } from 'react-grid-layout'
 import { db, type GridItem, type WindowInstance, type WindowKind, type Workspace } from '../db/db'
 import { WINDOW_TYPES } from '../windows/registry'
 import { uid } from './date'
@@ -6,11 +6,62 @@ import { uid } from './date'
 export const GRID_COLS = 24
 
 /**
- * Modo "Livre": a janela fica onde você soltar, mas só encaixa em espaço
- * vazio. Não empurra as outras (empurrar em cascata sem compactação gerava
- * buracos e sobreposições).
+ * Modo "Livre": a janela vai para onde você arrastar e as que estiverem no
+ * caminho descem só o necessário. Nada sobe sozinho (buracos ficam onde você
+ * deixou).
+ *
+ * Antes usávamos "preventCollision": qualquer posição que encostasse em outra
+ * janela era recusada, então com a mesa cheia a janela travava no lugar.
+ *
+ * Para não acumular empurrões (que geravam buracos e sobreposições), a cada
+ * movimento as outras janelas partem da posição que tinham quando o arraste
+ * começou; só a janela arrastada usa a posição nova.
  */
-export const freeCompactor = getCompactor(null, false, true)
+export function createFreeCompactor() {
+  let activeId: string | null = null
+  let start = new Map<string, { x: number; y: number }>()
+
+  const compactor: Compactor = {
+    type: null,
+    // A grade só posiciona a janela arrastada; quem resolve as colisões é o
+    // compact() abaixo, empurrando as outras para baixo.
+    allowOverlap: true,
+    compact(layout: Layout): Layout {
+      const items: LayoutItem[] = layout.map((l) => {
+        const c = { ...l, moved: false }
+        const s = c.i !== activeId ? start.get(c.i) : undefined
+        if (s) {
+          c.x = s.x
+          c.y = s.y
+        }
+        return c
+      })
+      const active = items.find((c) => c.i === activeId)
+      const placed: LayoutItem[] = active ? [active] : []
+      const others = items.filter((c) => c !== active).sort((a, b) => a.y - b.y || a.x - b.x)
+      for (const c of others) {
+        let hit: LayoutItem | undefined
+        while ((hit = placed.find((p) => collides(p, c)))) c.y = hit.y + hit.h
+        placed.push(c)
+      }
+      return items
+    },
+  }
+
+  return {
+    compactor,
+    /** Chamar no início do arraste/redimensionamento. */
+    begin(layout: Layout, id: string) {
+      activeId = id
+      start = new Map(layout.map((l) => [l.i, { x: l.x, y: l.y }]))
+    },
+    /** Chamar no fim (depois que a grade já calculou a posição final). */
+    end() {
+      activeId = null
+      start = new Map()
+    },
+  }
+}
 
 export function hasOverlap(layout: readonly GridItem[]): boolean {
   for (let i = 0; i < layout.length; i++)

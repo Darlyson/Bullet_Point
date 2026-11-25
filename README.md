@@ -6,7 +6,7 @@ App de produtividade "tudo vinculado": hábitos, bullet journal, notas, sessões
 
 ```bash
 npm install
-npm run desktop        # app desktop (Tauri) com recarga automática ao editar o código
+npm run desktop        # versão de TESTE (Tauri) com recarga automática ao editar o código
 npm run desktop:build  # gera o instalador em src-tauri/target/release/bundle/nsis/
 npm run dev            # só no navegador: http://localhost:5173
 npm run build          # checa tipos e gera a versão web em dist/
@@ -16,6 +16,8 @@ O app desktop precisa de [Rust](https://rustup.rs) e do Visual Studio com "Desen
 
 > ⚠ No Windows, rode os comandos do desktop pelo **PowerShell** ou CMD, não pelo Git Bash. O comando `link` do Git Bash esconde o `link.exe` da Microsoft e a compilação falha com "link: extra operand".
 
+> **Versão de teste × instalada:** a de teste (`npm run desktop` / `npm run dev`) tem o selo laranja **TESTE** no topo e "TESTE" no título da janela. A instalada não tem.
+
 > **Os dados do app desktop e do navegador são separados.** Cada um tem seu próprio banco local. Para levar dados de um para o outro, use **⋯ → Exportar** num e **Importar** no outro.
 
 ## Como usar
@@ -24,7 +26,7 @@ O app desktop precisa de [Rust](https://rustup.rs) e do Visual Studio com "Desen
 - **Redimensionar:** pelas bordas (direita, esquerda, baixo) ou pelo canto inferior direito.
 - **Maximizar:** clique duplo no título (ou no botão □).
 - **+ Janela:** adiciona módulos. Você pode abrir mais de uma janela de Notas, Hábitos etc.
-- **✥ Livre / ⇧ Auto-encaixe:** no modo livre a janela fica onde você soltar, mas só encaixa em espaço vazio: em cima de outra janela, ela volta ao lugar, sem empurrar ninguém. No auto-encaixe as janelas sobem e se empilham sozinhas.
+- **✥ Livre / ⇧ Auto-encaixe:** no modo livre a janela fica onde você soltar e as que estiverem no caminho descem só o necessário (nada sobe sozinho). No auto-encaixe as janelas sobem e se empilham sozinhas.
 - **▦ Organizar:** junta todas as janelas no topo, sem buracos nem sobreposições.
 - **🔓 Editar / 🔒 Travado:** trava o layout para não mover nada sem querer.
 - **Abas no topo:** cada aba é um espaço de trabalho (ex.: "Estudo", "Manhã"). Clique duplo renomeia, botão direito exclui.

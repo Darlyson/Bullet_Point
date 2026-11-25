@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Bullet Point",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "identifier": "com.darlyson.bulletpoint",
   "build": {
     "frontendDist": "../dist",
@@ -14,8 +14,8 @@
       {
         "label": "main",
         "title": "Bullet Point",
-        "width": 1600,
-        "height": 950,
+        "width": 1280,
+        "height": 800,
         "minWidth": 1100,
         "minHeight": 700,
         "center": true,

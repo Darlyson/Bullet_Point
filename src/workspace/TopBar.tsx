@@ -59,6 +59,11 @@ export default function TopBar({ workspaces, active, onSelect }: Props) {
   return (
     <nav className="topbar" onMouseLeave={() => setMenu(null)}>
       <div className="brand">◆ Bullet Point</div>
+      {import.meta.env.DEV && (
+        <span className="dev-badge" title="Versão de teste (npm run desktop / npm run dev). Os dados são separados do app instalado.">
+          TESTE
+        </span>
+      )}
 
       <div className="tabs">
         {workspaces.map((ws) => (
