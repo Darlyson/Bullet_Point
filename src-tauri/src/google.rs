@@ -54,6 +54,7 @@ struct TokenResponse {
   expires_in: u64,
   refresh_token: Option<String>,
   id_token: Option<String>,
+  scope: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -322,6 +323,16 @@ pub async fn google_connect(
       ])
       .await
       .map_err(|e| if e == NOT_CONNECTED { "O Google recusou o código de login. Tente de novo.".into() } else { e })?;
+
+      if let Some(ref sc) = tokens.scope {
+        if !sc.contains("calendar") {
+          return Err(
+            "Na tela do Google, você precisa marcar a caixinha que autoriza o Google Agenda antes de clicar em Continuar."
+              .into(),
+          );
+        }
+      }
+
       let refresh_token =
         tokens.refresh_token.ok_or("O Google não devolveu a autorização duradoura. Tente de novo.")?;
 
@@ -411,10 +422,10 @@ pub async fn google_access_token(state: State<'_, GoogleState>, force: bool) -> 
   Ok(tokens.access_token)
 }
 
-/// Está conectado?
+/// Está conectado com um token OAuth real do Google?
 #[tauri::command]
 pub fn google_status() -> bool {
-  load().is_some()
+  load().is_some_and(|s| !s.refresh_token.is_empty() && s.refresh_token != "local")
 }
 
 /// Desconecta: revoga o token no Google e apaga a sessão local.

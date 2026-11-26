@@ -104,7 +104,8 @@ export async function refreshConnected() {
     return connected
   }
   const connected = await invoke<boolean>('google_status').catch(() => false)
-  set({ connected, ready: true })
+  if (!connected) localStorage.removeItem(ACCOUNT_KEY)
+  set({ connected, account: connected ? status.account : undefined, ready: true })
   return connected
 }
 
@@ -122,7 +123,16 @@ export async function syncNow() {
     if (notConnected(e)) {
       set({ syncing: false, lastSync: status.lastSync ?? Date.now(), error: undefined })
     } else {
-      set({ syncing: false, error: e instanceof Error ? e.message : String(e) })
+      const msg = e instanceof Error ? e.message : String(e)
+      if (msg.toLowerCase().includes('insufficient authentication scopes')) {
+        set({
+          syncing: false,
+          error:
+            'Faltou marcar a caixinha do Google Agenda na tela do Google. Clique em "Sair da conta", entre de novo e marque a caixinha da agenda.',
+        })
+      } else {
+        set({ syncing: false, error: msg })
+      }
     }
   }
 }
@@ -173,12 +183,12 @@ export async function connectWithGoogle() {
   let account = out?.email
   if (!account && (hasGoogleConfig(cfg) || out?.providerToken)) {
     try {
-      const cal = await api.fetch('https://www.googleapis.com/calendar/v3/calendars/primary', {
+      const info = await api.fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${await api.token(false)}` },
       })
-      account = ((await cal.json()) as { id?: string }).id
+      account = ((await info.json()) as { email?: string }).email
     } catch {
-      /* segue mesmo sem conseguir ler o id da agenda */
+      /* segue mesmo sem conseguir ler o e-mail */
     }
   }
 
