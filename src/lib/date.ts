@@ -47,3 +47,9 @@ export const dateLong = (iso: string) => longFmt.format(parseISODate(iso))
 export const dateShort = (iso: string) => shortFmt.format(parseISODate(iso))
 
 export const uid = () => crypto.randomUUID()
+
+/** Horário de um evento: "09:00–10:00", "09:00" ou "" (dia inteiro). */
+export function timeLabel(b: { time?: string; endTime?: string }): string {
+  if (!b.time) return ''
+  return b.endTime ? `${b.time}–${b.endTime}` : b.time
+}

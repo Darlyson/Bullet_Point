@@ -1,5 +1,6 @@
 import { collides, verticalCompactor, type Compactor, type Layout, type LayoutItem } from 'react-grid-layout'
 import { db, type GridItem, type WindowInstance, type WindowKind, type Workspace } from '../db/db'
+import { withoutCloudTracking } from '../cloud/track'
 import { WINDOW_TYPES } from '../windows/registry'
 import { uid } from './date'
 
@@ -100,20 +101,22 @@ function build(name: string, order: number, parts: ReturnType<typeof win>[]): Wo
 
 /** Cria os espaços de trabalho iniciais na primeira vez que o app abre. */
 export async function ensureDefaultWorkspaces() {
-  await db.transaction('rw', db.workspaces, async () => {
-    if ((await db.workspaces.count()) > 0) return
-    await db.workspaces.bulkAdd([
-      build('Principal', 0, [
-        win('focus', 0, 0, 7, 14),
-        win('youtube', 7, 0, 11, 14),
-        win('today', 18, 0, 6, 14),
-        win('habits', 0, 14, 10, 12),
-        win('journal', 10, 14, 7, 16),
-        win('notes', 17, 14, 7, 16),
-      ]),
-      build('Análise', 1, [win('stats', 0, 0, 14, 22), win('topics', 14, 0, 10, 14)]),
-    ])
-  })
+  await withoutCloudTracking(() =>
+    db.transaction('rw', db.workspaces, async () => {
+      if ((await db.workspaces.count()) > 0) return
+      await db.workspaces.bulkAdd([
+        build('Principal', 0, [
+          win('focus', 0, 0, 7, 14),
+          win('youtube', 7, 0, 11, 14),
+          win('today', 18, 0, 6, 14),
+          win('habits', 0, 14, 10, 12),
+          win('journal', 10, 14, 7, 16),
+          win('notes', 17, 14, 7, 16),
+        ]),
+        build('Análise', 1, [win('stats', 0, 0, 14, 22), win('topics', 14, 0, 10, 14)]),
+      ])
+    }),
+  )
 }
 
 export async function addWindow(ws: Workspace, kind: WindowKind) {

@@ -11,8 +11,8 @@ Lista viva: marque com `[x]` o que terminar e mova para `VERSOES.md`. A ordem é
 
 - [x] **Filtro global por tópico** (0.1.4).
 - [x] **Desktop**: atalhos globais e ícone na bandeja do sistema (0.1.5).
-- [ ] **Google Calendar**: eventos do diário ↔ calendário.
-- [ ] **Sincronização em nuvem** (Supabase) entre PC e celular.
+- [x] **Google Calendar**: eventos do diário ↔ calendário (0.1.6).
+- [x] **Sincronização em nuvem** (Supabase) entre PC e celular (0.1.7).
 - [ ] **Android** (Capacitor) + Health Connect para smart band (sono, passos, batimentos). Fica por último: ainda não há smart band.
 
 ## Ideias soltas

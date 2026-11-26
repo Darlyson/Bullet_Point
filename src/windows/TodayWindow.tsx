@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
-import { dateLong, formatMinutes, toISODate } from '../lib/date'
+import { dateLong, formatMinutes, timeLabel, toISODate } from '../lib/date'
 import { toggleHabit } from '../lib/actions'
 import { useFocus } from '../focus/FocusContext'
 import { inTopic, useTopicFilter } from '../topics/context'
@@ -21,6 +21,9 @@ export default function TodayWindow() {
       habits: habits.filter((h) => !h.archived && inTopic(h.topicId, filter)),
       done: new Set(logs.map((l) => l.habitId)),
       tasks: bullets.filter((b) => b.type === 'task' && inTopic(b.topicId, filter)),
+      events: bullets
+        .filter((b) => b.type === 'event' && inTopic(b.topicId, filter))
+        .sort((a, b) => (a.time ?? '').localeCompare(b.time ?? '')),
       focusSec: sessions.filter((s) => inTopic(s.topicId, filter)).reduce((a, s) => a + s.durationSec, 0),
     }
   }, [today, filter])
@@ -52,6 +55,19 @@ export default function TodayWindow() {
           <div className="tile-label">tarefas</div>
         </div>
       </div>
+
+      {data.events.length > 0 && (
+        <section>
+          <h4>Agenda de hoje</h4>
+          <ul className="plain agenda">
+            {data.events.map((e) => (
+              <li key={e.id}>
+                <span className="time">{timeLabel(e) || 'dia todo'}</span> {e.text}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {data.habits.length > 0 && (
         <section>

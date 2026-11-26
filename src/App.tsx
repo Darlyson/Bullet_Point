@@ -6,6 +6,11 @@ import { showDesktopWindow } from './lib/desktop'
 import { FocusProvider } from './focus/FocusContext'
 import { TopicFilterProvider } from './topics/TopicFilter'
 import DesktopBridge from './desktop/DesktopBridge'
+import GoogleSync from './google/GoogleSync'
+import CloudSync from './cloud/CloudSync'
+import GoogleDialog from './google/GoogleDialog'
+import { hasSkippedLogin, setSkippedLogin, useGoogleStatus } from './google/store'
+import { useCloudStatus } from './cloud/store'
 import TopBar from './workspace/TopBar'
 import WorkspaceCanvas from './workspace/WorkspaceCanvas'
 
@@ -13,6 +18,9 @@ const ACTIVE_KEY = 'bp-active-workspace'
 
 export default function App() {
   const [activeId, setActiveId] = useState(() => localStorage.getItem(ACTIVE_KEY) ?? '')
+  const google = useGoogleStatus()
+  const cloud = useCloudStatus()
+  const showLoginOnStart = google.ready && !google.connected && !cloud.connected && !hasSkippedLogin()
 
   useEffect(() => {
     void ensureDefaultWorkspaces()
@@ -43,6 +51,9 @@ export default function App() {
           <WorkspaceCanvas key={active.id} ws={active} />
         </div>
         <DesktopBridge />
+        <GoogleSync />
+        <CloudSync />
+        {showLoginOnStart && <GoogleDialog onClose={() => setSkippedLogin(true)} />}
       </FocusProvider>
     </TopicFilterProvider>
   )

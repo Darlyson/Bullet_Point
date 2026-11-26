@@ -43,6 +43,20 @@ export interface Bullet {
   text: string
   topicId?: string
   createdAt: number
+  /** Evento: horário "HH:MM" de início e de fim. Sem horário = dia inteiro. */
+  time?: string
+  endTime?: string
+  /** Momento (ms) da última alteração. */
+  updatedAt?: number
+  /** Google Agenda: id do evento lá. */
+  gcalId?: string
+  /** Google Agenda: mudou aqui e ainda não foi enviado (ver src/google/track.ts). */
+  gcalDirty?: boolean
+  /**
+   * Muda a cada escrita do sincronizador. O Dexie só passa ao "hook" os campos
+   * que mudaram de valor; este sempre muda, então o hook sabe que não foi você.
+   */
+  gcalSync?: string
 }
 
 export interface Note {
@@ -124,8 +138,13 @@ db.version(1).stores({
   focusSessions: 'id, topicId, date, startedAt',
   workspaces: 'id, order',
 })
+// v2: Google Agenda (achar o bullet pelo id do evento no Google).
+db.version(2).stores({
+  bullets: 'id, date, topicId, status, gcalId',
+})
 
 // Em desenvolvimento, permite inspecionar o banco pelo console do navegador: `db.habits.toArray()`
 if (import.meta.env.DEV) (globalThis as Record<string, unknown>).db = db
 
-export const TABLES =['workspaces', 'topics', 'habits', 'habitLogs', 'bullets', 'notes', 'focusSessions'] as const
+export const TABLES = ['workspaces', 'topics', 'habits', 'habitLogs', 'bullets', 'notes', 'focusSessions'] as const
+export type TableName = (typeof TABLES)[number]

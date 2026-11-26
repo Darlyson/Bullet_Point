@@ -3,6 +3,8 @@ use tauri::Manager;
 
 #[cfg(desktop)]
 mod desktop;
+#[cfg(desktop)]
+mod google;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -19,7 +21,16 @@ pub fn run() {
   #[cfg(desktop)]
   {
     builder = builder
-      .invoke_handler(tauri::generate_handler![desktop::set_focus_status, desktop::shortcut_status])
+      .plugin(tauri_plugin_opener::init())
+      .manage(google::GoogleState::default())
+      .invoke_handler(tauri::generate_handler![
+        desktop::set_focus_status,
+        desktop::shortcut_status,
+        google::google_connect,
+        google::google_access_token,
+        google::google_status,
+        google::google_disconnect,
+      ])
       .on_window_event(desktop::on_window_event);
   }
 

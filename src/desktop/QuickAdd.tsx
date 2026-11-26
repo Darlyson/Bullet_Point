@@ -22,6 +22,7 @@ export default function QuickAdd({ restore, onClose }: { restore: Restore; onClo
   const [text, setText] = useState('')
   const [type, setType] = useState<BulletType>('task')
   const [topicId, setTopicId] = useState(filter)
+  const [time, setTime] = useState('')
 
   async function close() {
     onClose()
@@ -41,6 +42,7 @@ export default function QuickAdd({ restore, onClose }: { restore: Restore; onClo
       text: text.trim(),
       topicId: topicId || undefined,
       createdAt: Date.now(),
+      ...(type === 'event' && time ? { time } : {}),
     })
     await close()
   }
@@ -68,6 +70,9 @@ export default function QuickAdd({ restore, onClose }: { restore: Restore; onClo
                 {t.label}
               </button>
             ))}
+            {type === 'event' && (
+              <input type="time" value={time} onChange={(e) => setTime(e.target.value)} title="Horário (opcional)" />
+            )}
             <TopicSelect value={topicId} onChange={setTopicId} />
           </div>
           <small className="muted">Enter salva · Esc cancela</small>

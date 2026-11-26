@@ -7,6 +7,9 @@ import { formatDuration } from '../lib/date'
 import { exportData, importData } from '../lib/backup'
 import WindowControls from './WindowControls'
 import ShortcutList from '../desktop/ShortcutList'
+import GoogleDialog, { GoogleLogo } from '../google/GoogleDialog'
+import { since, useGoogleStatus } from '../google/store'
+import { useCloudStatus } from '../cloud/store'
 import { TopicSelect, useTopics } from '../components/topics'
 import { useTopicFilter } from '../topics/context'
 
@@ -18,12 +21,19 @@ interface Props {
 
 export default function TopBar({ workspaces, active, onSelect }: Props) {
   const [menu, setMenu] = useState<'add' | 'data' | null>(null)
+  const [googleOpen, setGoogleOpen] = useState(false)
+  const google = useGoogleStatus()
+  const cloud = useCloudStatus()
   const fileRef = useRef<HTMLInputElement>(null)
   const { state, elapsed, remaining } = useFocus()
   const filter = useTopicFilter()
   const filterTopic = useTopics().byId.get(filter.topicId)
 
   const hasWindow = (k: WindowKind) => active.windows.some((w) => w.kind === k)
+  const syncConnected = google.connected || cloud.connected
+  const syncBusy = google.syncing || cloud.syncing
+  const lastSync = Math.max(google.lastSync ?? 0, cloud.lastSync ?? 0) || undefined
+  const syncError = google.error || cloud.error
 
   async function newWorkspace() {
     const name = prompt('Nome do novo espaço de trabalho:', 'Novo espaço')
@@ -64,142 +74,180 @@ export default function TopBar({ workspaces, active, onSelect }: Props) {
 
   // Áreas com data-tauri-drag-region arrastam o app (clique duplo maximiza).
   return (
-    <nav className="topbar" data-tauri-drag-region onMouseLeave={() => setMenu(null)}>
-      <div className="brand" data-tauri-drag-region>◆ Bullet Point</div>
-      {import.meta.env.DEV && (
-        <span className="dev-badge" data-tauri-drag-region title="Versão de teste (npm run desktop / npm run dev). Os dados são separados do app instalado.">
-          TESTE
-        </span>
-      )}
-
-      <div className="tabs">
-        {workspaces.map((ws) => (
-          <button
-            key={ws.id}
-            className={`tab ${ws.id === active.id ? 'active' : ''}`}
-            onClick={() => onSelect(ws.id)}
-            onDoubleClick={() => rename(ws)}
-            onContextMenu={(e) => {
-              e.preventDefault()
-              void removeWs(ws)
-            }}
-            title="Clique duplo: renomear · Botão direito: excluir"
-          >
-            {ws.name}
-          </button>
-        ))}
-        <button className="tab ghost" onClick={newWorkspace} title="Novo espaço de trabalho">
-          +
-        </button>
-      </div>
-
-      <div className="spacer" data-tauri-drag-region />
-
-      <div
-        className={`topic-filter ${filterTopic ? 'on' : ''}`}
-        style={filterTopic ? { borderColor: filterTopic.color } : undefined}
-      >
-        {filterTopic && <span className="dot" style={{ background: filterTopic.color }} />}
-        <TopicSelect allowAll value={filter.topicId} onChange={filter.setTopicId} title="Filtrar todas as janelas por tópico" />
-        {filterTopic && (
-          <button className="icon-btn ghost" title="Tirar o filtro" onClick={() => filter.setTopicId('')}>
-            ✕
-          </button>
+    <>
+      <nav className="topbar" data-tauri-drag-region onMouseLeave={() => setMenu(null)}>
+        <div className="brand" data-tauri-drag-region>◆ Bullet Point</div>
+        {import.meta.env.DEV && (
+          <span className="dev-badge" data-tauri-drag-region title="Versão de teste (npm run desktop / npm run dev). Os dados são separados do app instalado.">
+            TESTE
+          </span>
         )}
-      </div>
 
-      {state.status !== 'idle' && (
-        <div className={`mini-timer ${state.status}`} title={state.label}>
-          ⏱ {formatDuration(remaining ?? elapsed)}
+        <div className="tabs">
+          {workspaces.map((ws) => (
+            <button
+              key={ws.id}
+              className={`tab ${ws.id === active.id ? 'active' : ''}`}
+              onClick={() => onSelect(ws.id)}
+              onDoubleClick={() => rename(ws)}
+              onContextMenu={(e) => {
+                e.preventDefault()
+                void removeWs(ws)
+              }}
+              title="Clique duplo: renomear · Botão direito: excluir"
+            >
+              {ws.name}
+            </button>
+          ))}
+          <button className="tab ghost" onClick={newWorkspace} title="Novo espaço de trabalho">
+            +
+          </button>
         </div>
-      )}
 
-      <div className="menu-wrap">
-        <button className="primary" onClick={() => setMenu(menu === 'add' ? null : 'add')}>
-          + Janela
-        </button>
-        {menu === 'add' && (
-          <div className="menu">
-            {(Object.keys(WINDOW_TYPES) as WindowKind[]).map((k) => {
-              const t = WINDOW_TYPES[k]
-              const disabled = t.single && hasWindow(k)
-              return (
-                <button
-                  key={k}
-                  disabled={disabled}
-                  onClick={() => {
-                    void addWindow(active, k)
-                    setMenu(null)
-                  }}
-                >
-                  <span className="win-icon">{t.icon}</span>
-                  <span>
-                    <strong>{t.title}</strong>
-                    <small>{disabled ? 'já está aberta' : t.description}</small>
-                  </span>
-                </button>
-              )
-            })}
+        <div className="spacer" data-tauri-drag-region />
+
+        <div
+          className={`topic-filter ${filterTopic ? 'on' : ''}`}
+          style={filterTopic ? { borderColor: filterTopic.color } : undefined}
+        >
+          {filterTopic && <span className="dot" style={{ background: filterTopic.color }} />}
+          <TopicSelect allowAll value={filter.topicId} onChange={filter.setTopicId} title="Filtrar todas as janelas por tópico" />
+          {filterTopic && (
+            <button className="icon-btn ghost" title="Tirar o filtro" onClick={() => filter.setTopicId('')}>
+              ✕
+            </button>
+          )}
+        </div>
+
+        {syncError && (
+          <button className="chip warn" onClick={() => setGoogleOpen(true)} title={syncError}>
+            ⚠ Conta Google
+          </button>
+        )}
+
+        {state.status !== 'idle' && (
+          <div className={`mini-timer ${state.status}`} title={state.label}>
+            ⏱ {formatDuration(remaining ?? elapsed)}
           </div>
         )}
-      </div>
 
-      <button
-        className="chip"
-        onClick={() => organizeWorkspace(active)}
-        title="Junta as janelas no topo, sem buracos nem sobreposições"
-        disabled={active.locked}
-      >
-        ▦ Organizar
-      </button>
-      <button
-        className={active.snap === 'auto' ? 'chip active' : 'chip'}
-        onClick={() => db.workspaces.update(active.id, { snap: active.snap === 'auto' ? 'free' : 'auto' })}
-        title="Livre: a janela fica onde você soltar. Auto: as janelas sobem e se empilham sozinhas."
-      >
-        {active.snap === 'auto' ? '⇧ Auto-encaixe' : '✥ Livre'}
-      </button>
-      <button
-        className={active.locked ? 'chip active' : 'chip'}
-        onClick={() => db.workspaces.update(active.id, { locked: !active.locked })}
-        title="Travar o layout para não mover janelas sem querer"
-      >
-        {active.locked ? '🔒 Travado' : '🔓 Editar'}
-      </button>
+        <div className="menu-wrap">
+          <button className="primary" onClick={() => setMenu(menu === 'add' ? null : 'add')}>
+            + Janela
+          </button>
+          {menu === 'add' && (
+            <div className="menu">
+              {(Object.keys(WINDOW_TYPES) as WindowKind[]).map((k) => {
+                const t = WINDOW_TYPES[k]
+                const disabled = t.single && hasWindow(k)
+                return (
+                  <button
+                    key={k}
+                    disabled={disabled}
+                    onClick={() => {
+                      void addWindow(active, k)
+                      setMenu(null)
+                    }}
+                  >
+                    <span className="win-icon">{t.icon}</span>
+                    <span>
+                      <strong>{t.title}</strong>
+                      <small>{disabled ? 'já está aberta' : t.description}</small>
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
 
-      <div className="menu-wrap">
-        <button className="ghost" onClick={() => setMenu(menu === 'data' ? null : 'data')} title="Backup e atalhos">
-          ⋯
+        <button
+          className="chip"
+          onClick={() => organizeWorkspace(active)}
+          title="Junta as janelas no topo, sem buracos nem sobreposições"
+          disabled={active.locked}
+        >
+          ▦ Organizar
         </button>
-        {menu === 'data' && (
-          <div className="menu right">
-            <button onClick={doExport}>
-              <span className="win-icon">⤓</span>
-              <span>
-                <strong>Exportar backup</strong>
-                <small>Salva tudo num arquivo .json</small>
-              </span>
-            </button>
-            <button onClick={() => fileRef.current?.click()}>
-              <span className="win-icon">⤒</span>
-              <span>
-                <strong>Importar backup</strong>
-                <small>Substitui os dados atuais</small>
-              </span>
-            </button>
-            <ShortcutList />
-          </div>
-        )}
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json"
-          hidden
-          onChange={(e) => e.target.files?.[0] && doImport(e.target.files[0])}
-        />
-      </div>
+        <button
+          className={active.snap === 'auto' ? 'chip active' : 'chip'}
+          onClick={() => db.workspaces.update(active.id, { snap: active.snap === 'auto' ? 'free' : 'auto' })}
+          title="Livre: a janela fica onde você soltar. Auto: as janelas sobem e se empilham sozinhas."
+        >
+          {active.snap === 'auto' ? '⇧ Auto-encaixe' : '✥ Livre'}
+        </button>
+        <button
+          className={active.locked ? 'chip active' : 'chip'}
+          onClick={() => db.workspaces.update(active.id, { locked: !active.locked })}
+          title="Travar o layout para não mover janelas sem querer"
+        >
+          {active.locked ? '🔒 Travado' : '🔓 Editar'}
+        </button>
 
-      <WindowControls />
-    </nav>
+        <button
+          className={`chip google-chip ${syncConnected ? 'connected' : ''}`}
+          onClick={() => setGoogleOpen(true)}
+          title={
+            syncConnected
+              ? `Conectado como ${google.account || cloud.email || 'Conta Google'}`
+              : 'Entrar com o Google'
+          }
+        >
+          <GoogleLogo size={14} />
+          <span>{syncConnected ? (google.account || cloud.email || 'Conectado').split('@')[0] : 'Entrar'}</span>
+        </button>
+
+        <div className="menu-wrap">
+          <button className="ghost" onClick={() => setMenu(menu === 'data' ? null : 'data')} title="Backup, sincronização e atalhos">
+            ⋯
+          </button>
+          {menu === 'data' && (
+            <div className="menu right">
+              <button
+                onClick={() => {
+                  setGoogleOpen(true)
+                  setMenu(null)
+                }}
+              >
+                <span className="win-icon">☁</span>
+                <span>
+                  <strong>Conta Google (Agenda + Nuvem)</strong>
+                  <small>
+                    {syncConnected
+                      ? `${syncBusy ? 'Sincronizando…' : `Sincronizado ${since(lastSync)}`}`
+                      : 'Entrar com 1 clique para sincronizar tudo'}
+                  </small>
+                </span>
+              </button>
+              <button onClick={doExport}>
+                <span className="win-icon">⤓</span>
+                <span>
+                  <strong>Exportar backup</strong>
+                  <small>Salva tudo num arquivo .json</small>
+                </span>
+              </button>
+              <button onClick={() => fileRef.current?.click()}>
+                <span className="win-icon">⤒</span>
+                <span>
+                  <strong>Importar backup</strong>
+                  <small>Substitui os dados atuais</small>
+                </span>
+              </button>
+              <ShortcutList />
+            </div>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/json"
+            hidden
+            onChange={(e) => e.target.files?.[0] && doImport(e.target.files[0])}
+          />
+        </div>
+
+        <WindowControls />
+      </nav>
+      {googleOpen && <GoogleDialog onClose={() => setGoogleOpen(false)} />}
+    </>
   )
 }

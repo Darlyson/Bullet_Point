@@ -22,6 +22,8 @@ export function streak(doneDates: Set<string>, today = toISODate()): number {
 export async function migrateBullet(b: Bullet, toDate: string) {
   await db.transaction('rw', db.bullets, async () => {
     await db.bullets.update(b.id, { status: 'migrated' })
-    await db.bullets.add({ ...b, id: uid(), date: toDate, status: 'open', createdAt: Date.now() })
+    // A cópia é um item novo: não leva o vínculo com o Google Agenda.
+    const { gcalId: _id, gcalDirty: _dirty, ...rest } = b
+    await db.bullets.add({ ...rest, id: uid(), date: toDate, status: 'open', createdAt: Date.now() })
   })
 }

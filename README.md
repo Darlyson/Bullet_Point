@@ -31,7 +31,8 @@ O app desktop precisa de [Rust](https://rustup.rs) e do Visual Studio com "Desen
 - **▦ Organizar:** junta todas as janelas no topo, sem buracos nem sobreposições.
 - **🔓 Editar / 🔒 Travado:** trava o layout para não mover nada sem querer.
 - **Abas no topo:** cada aba é um espaço de trabalho (ex.: "Estudo", "Manhã"). Clique duplo renomeia, botão direito exclui.
-- **⋯:** exporta ou importa um backup `.json` de todos os dados, e lista os atalhos globais.
+- **Diário:** tarefas (`•`), eventos (`○`, com horário opcional) e notas (`–`). Clique duplo no texto edita o item.
+- **⋯:** **Conta Google (Agenda + Nuvem)** — com 1 clique em **Entrar com o Google**, sincroniza em mão dupla os eventos (`○`) com o **Google Agenda** e todos os dados na nuvem (**Supabase**) entre PC e celular. Também exporta/importa backup `.json` e lista os atalhos globais.
 
 **App desktop: bandeja e atalhos.** O ✕ não encerra o app: ele vai para o ícone da bandeja (perto do relógio), com o cronômetro e os atalhos funcionando. Clique no ícone para abrir; botão direito → **Sair** para fechar de vez. Atalhos que funcionam de qualquer lugar:
 
@@ -54,11 +55,14 @@ src-tauri/                 Casca desktop (Rust/Tauri): janela, ícone, instalado
   tauri.conf.json          Nome, tamanho da janela, identificador (não mude o
                            identifier: é ele que define onde os dados ficam salvos)
   src/desktop.rs           Bandeja, atalhos globais, fechar → bandeja
+  src/google.rs            Login OAuth no Google + token no Gerenciador de Credenciais
 src/
   db/db.ts                 Modelo de dados + banco local (IndexedDB via Dexie)
   focus/FocusContext.tsx   Cronômetro global (continua rodando entre janelas)
   topics/                  Filtro global por tópico (TopicFilter.tsx + context.ts)
   desktop/                 Ponte com o app desktop: atalhos, anotação rápida, lista de atalhos
+  google/                  Sincronização em mão dupla com o Google Agenda
+  cloud/                   Sincronização em nuvem (Supabase) entre PC e celular
   lib/
     workspaces.ts          Layouts padrão, adicionar/remover janelas
     actions.ts             Regras: marcar hábito, sequência, migrar tarefa
@@ -81,6 +85,6 @@ No modo dev, o banco fica acessível pelo console do navegador: `await db.habits
 1. ✅ MVP: janelas encaixáveis, hábitos, diário, notas, foco + YouTube, gráficos, tópicos, backup
 2. ✅ Filtro global por tópico (clicar num tópico filtra todas as janelas)
 3. ✅ App desktop (Tauri): ícone, janela própria, instalador, atalhos globais, bandeja do sistema
-4. ⬜ Google Calendar: eventos do diário ↔ calendário
-5. ⬜ Sincronização em nuvem (Supabase) entre PC e celular
+4. ✅ Google Calendar: eventos do diário ↔ calendário
+5. ✅ Sincronização em nuvem (Supabase) entre PC e celular
 6. ⬜ Android (Capacitor) + Health Connect para smart band (sono, passos, batimentos)

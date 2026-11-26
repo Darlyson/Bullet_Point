@@ -8,6 +8,22 @@ Formato: a mudança mais recente fica no topo. Cada item diz o que mudou **para 
 
 (nada ainda)
 
+## 0.1.7 (2026-11-26)
+
+### Novo
+- **Login único com o Google (Google Agenda + Nuvem Supabase)** em **⋯ → Conta Google (Agenda + Nuvem)**. Com 1 clique em **Entrar com o Google**, o usuário faz login no navegador e o app já conecta o **Google Agenda** e autentica automaticamente no **Supabase** (`signInWithIdToken` usando o `id_token` do Google), sem precisar criar senha nem configurar chaves.
+- **Sincronização em mão dupla por item (PC ↔ Celular)**: sincroniza espaços de trabalho, tópicos, hábitos, registros de hábito, diário, notas e sessões de foco ao abrir, a cada 3 minutos, ao voltar para a janela / recuperar a internet e 2 s após qualquer alteração.
+- **Integração com o Google Agenda via nuvem**: eventos criados ou editados no celular chegam ao PC pela nuvem e são sincronizados automaticamente com o Google Agenda.
+- **Chaves do projeto embutidas (`.env`)**: suporte a `VITE_GOOGLE_CLIENT_ID`, `VITE_GOOGLE_CLIENT_SECRET`, `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (com seção recolhida para configuração em modo desenvolvedor).
+
+## 0.1.6 (2026-11-26)
+
+### Novo
+- **Google Agenda em mão dupla** (**⋯ → Google Agenda**, no app desktop). Os eventos (`○`) do diário e os da sua agenda principal do Google ficam iguais nos dois lados: criar, mudar título/dia/horário ou excluir de um lado reflete no outro. Sincroniza ao abrir, a cada 5 minutos, ao voltar para a janela e 2 s depois de mexer num evento.
+- **Horário nos eventos (`○`)**: início e fim opcionais no Diário (e início na anotação rápida `Ctrl+Alt+N`). Eventos aparecem no topo do dia ordenados por horário, ganham o selo `G` quando sincronizados e aparecem na seção **Agenda de hoje** da janela Hoje.
+- **Edição no Diário**: clique duplo no texto de qualquer tarefa, evento ou nota para editar o texto (e o horário, nos eventos).
+- **Credenciais seguras**: login OAuth com PKCE no navegador e autorização guardada no Gerenciador de Credenciais do Windows.
+
 ## 0.1.5 (2026-11-26)
 
 ### Novo
