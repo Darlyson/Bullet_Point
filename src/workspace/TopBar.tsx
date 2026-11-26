@@ -6,6 +6,7 @@ import { useFocus } from '../focus/FocusContext'
 import { formatDuration } from '../lib/date'
 import { exportData, importData } from '../lib/backup'
 import WindowControls from './WindowControls'
+import ShortcutList from '../desktop/ShortcutList'
 import { TopicSelect, useTopics } from '../components/topics'
 import { useTopicFilter } from '../topics/context'
 
@@ -167,7 +168,7 @@ export default function TopBar({ workspaces, active, onSelect }: Props) {
       </button>
 
       <div className="menu-wrap">
-        <button className="ghost" onClick={() => setMenu(menu === 'data' ? null : 'data')} title="Backup">
+        <button className="ghost" onClick={() => setMenu(menu === 'data' ? null : 'data')} title="Backup e atalhos">
           ⋯
         </button>
         {menu === 'data' && (
@@ -186,6 +187,7 @@ export default function TopBar({ workspaces, active, onSelect }: Props) {
                 <small>Substitui os dados atuais</small>
               </span>
             </button>
+            <ShortcutList />
           </div>
         )}
         <input

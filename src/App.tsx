@@ -5,6 +5,7 @@ import { ensureDefaultWorkspaces } from './lib/workspaces'
 import { showDesktopWindow } from './lib/desktop'
 import { FocusProvider } from './focus/FocusContext'
 import { TopicFilterProvider } from './topics/TopicFilter'
+import DesktopBridge from './desktop/DesktopBridge'
 import TopBar from './workspace/TopBar'
 import WorkspaceCanvas from './workspace/WorkspaceCanvas'
 
@@ -41,6 +42,7 @@ export default function App() {
           <TopBar workspaces={workspaces} active={active} onSelect={setActiveId} />
           <WorkspaceCanvas key={active.id} ws={active} />
         </div>
+        <DesktopBridge />
       </FocusProvider>
     </TopicFilterProvider>
   )

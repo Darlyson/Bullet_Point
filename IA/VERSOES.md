@@ -8,6 +8,21 @@ Formato: a mudança mais recente fica no topo. Cada item diz o que mudou **para 
 
 (nada ainda)
 
+## 0.1.5 (2026-11-26)
+
+### Novo
+- **Ícone na bandeja do sistema** (perto do relógio). Clique: abre o app. Botão direito: Abrir, Anotação rápida, Iniciar/pausar foco e Sair. Passando o mouse, mostra o cronômetro de foco (ex.: "⏱ Foco: 12 min — Inglês").
+- **Fechar (✕) agora manda o app para a bandeja** em vez de encerrar: o cronômetro e os atalhos continuam funcionando. Para sair de vez: botão direito no ícone → Sair.
+- **Atalhos globais** (funcionam com o app escondido ou com outro programa na frente):
+  - `Ctrl+Alt+B`: mostrar / esconder o app.
+  - `Ctrl+Alt+N`: anotação rápida. Abre uma caixa, você escreve, Enter salva no diário de hoje e o app volta para onde estava (bandeja ou minimizado). Dá para escolher tarefa/evento/nota e o tópico.
+  - `Ctrl+Alt+F`: iniciar / pausar o foco, com um bipe curto (agudo: começou; grave: pausou).
+- A lista de atalhos fica em **⋯ → Atalhos globais**. Se outro programa já usar uma combinação, ela aparece em amarelo.
+- **Uma instância só**: abrir o app de novo pelo menu Iniciar só traz de volta a janela que já está aberta (na bandeja).
+
+### Corrigido
+- O alarme do pomodoro não atrasa mais com o app escondido na bandeja.
+
 ## 0.1.4 (2026-11-25)
 
 ### Novo

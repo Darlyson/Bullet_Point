@@ -31,7 +31,17 @@ O app desktop precisa de [Rust](https://rustup.rs) e do Visual Studio com "Desen
 - **▦ Organizar:** junta todas as janelas no topo, sem buracos nem sobreposições.
 - **🔓 Editar / 🔒 Travado:** trava o layout para não mover nada sem querer.
 - **Abas no topo:** cada aba é um espaço de trabalho (ex.: "Estudo", "Manhã"). Clique duplo renomeia, botão direito exclui.
-- **⋯:** exporta ou importa um backup `.json` de todos os dados.
+- **⋯:** exporta ou importa um backup `.json` de todos os dados, e lista os atalhos globais.
+
+**App desktop: bandeja e atalhos.** O ✕ não encerra o app: ele vai para o ícone da bandeja (perto do relógio), com o cronômetro e os atalhos funcionando. Clique no ícone para abrir; botão direito → **Sair** para fechar de vez. Atalhos que funcionam de qualquer lugar:
+
+| Atalho | O que faz |
+| --- | --- |
+| `Ctrl+Alt+B` | Mostrar / esconder o app |
+| `Ctrl+Alt+N` | Anotação rápida no diário de hoje (Enter salva, Esc cancela) |
+| `Ctrl+Alt+F` | Iniciar / pausar o foco |
+
+Na versão de teste, se o app instalado estiver aberto, os atalhos ficam com ele (aparecem em amarelo em ⋯).
 
 **Tópicos** ligam tudo: um hábito, uma tarefa, uma nota ou uma sessão de foco podem pertencer a um tópico, que mantém a mesma cor em todas as janelas e gráficos.
 
@@ -43,10 +53,12 @@ O app desktop precisa de [Rust](https://rustup.rs) e do Visual Studio com "Desen
 src-tauri/                 Casca desktop (Rust/Tauri): janela, ícone, instalador
   tauri.conf.json          Nome, tamanho da janela, identificador (não mude o
                            identifier: é ele que define onde os dados ficam salvos)
+  src/desktop.rs           Bandeja, atalhos globais, fechar → bandeja
 src/
   db/db.ts                 Modelo de dados + banco local (IndexedDB via Dexie)
   focus/FocusContext.tsx   Cronômetro global (continua rodando entre janelas)
   topics/                  Filtro global por tópico (TopicFilter.tsx + context.ts)
+  desktop/                 Ponte com o app desktop: atalhos, anotação rápida, lista de atalhos
   lib/
     workspaces.ts          Layouts padrão, adicionar/remover janelas
     actions.ts             Regras: marcar hábito, sequência, migrar tarefa
@@ -68,7 +80,7 @@ No modo dev, o banco fica acessível pelo console do navegador: `await db.habits
 
 1. ✅ MVP: janelas encaixáveis, hábitos, diário, notas, foco + YouTube, gráficos, tópicos, backup
 2. ✅ Filtro global por tópico (clicar num tópico filtra todas as janelas)
-3. ✅ App desktop (Tauri): ícone, janela própria, instalador. ⬜ atalhos globais, bandeja do sistema
+3. ✅ App desktop (Tauri): ícone, janela própria, instalador, atalhos globais, bandeja do sistema
 4. ⬜ Google Calendar: eventos do diário ↔ calendário
 5. ⬜ Sincronização em nuvem (Supabase) entre PC e celular
 6. ⬜ Android (Capacitor) + Health Connect para smart band (sono, passos, batimentos)

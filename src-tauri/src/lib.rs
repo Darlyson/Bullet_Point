@@ -1,9 +1,29 @@
 use std::time::Duration;
 use tauri::Manager;
 
+#[cfg(desktop)]
+mod desktop;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  tauri::Builder::default()
+  let mut builder = tauri::Builder::default();
+
+  // Uma instância só: abrir o app de novo (atalho da área de trabalho, menu
+  // Iniciar) só traz de volta a janela que já está na bandeja. Fica de fora
+  // na versão de teste, que senão se fecharia e abriria o app instalado.
+  #[cfg(all(desktop, not(debug_assertions)))]
+  {
+    builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| desktop::show_main(app)));
+  }
+
+  #[cfg(desktop)]
+  {
+    builder = builder
+      .invoke_handler(tauri::generate_handler![desktop::set_focus_status, desktop::shortcut_status])
+      .on_window_event(desktop::on_window_event);
+  }
+
+  builder
     .setup(|app| {
       if cfg!(debug_assertions) {
         app.handle().plugin(
@@ -22,6 +42,9 @@ pub fn run() {
           let _ = window.show();
         });
       }
+
+      #[cfg(desktop)]
+      desktop::setup(app)?;
 
       #[cfg(windows)]
       if let Some(window) = app.get_webview_window("main") {

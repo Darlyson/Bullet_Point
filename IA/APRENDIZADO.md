@@ -28,6 +28,7 @@ Anotações práticas do que funciona (e do que deu errado) ao construir o Bulle
 | 2026-11-25 | O travamento voltou e, medindo com o app travado, apareceu a causa: o mouse ficava preso na janela principal com o botão solto (o app não estava lento, só não recebia cliques). | Descrever **o que se vê** ("não responde a clique" × "fica lento") ajuda a achar a causa. E medir **no momento** do problema, sem fechar o app. |
 | 2026-11-25 | "Às vezes funciona, às vezes não": um teste com e sem clique na página antes de arrastar mostrou o padrão (falha quase sempre depois de clicar na página). A primeira correção (soltar o mouse preso) só tratava o sintoma. | Para bug intermitente, procure **o que muda entre as vezes que funciona e as que falham** e teste cada hipótese em repetição (5 de 5, 0 de 5). Corrigir o sintoma ajuda, mas não encerra o problema. |
 | 2026-11-25 | Modo dev e app instalado mostravam dados diferentes. | Cada um tem seu próprio banco local. Para testar com dados reais: **⋯ → Exportar** no instalado, **Importar** no dev. |
+| 2026-11-26 | Ao testar a bandeja por script, o atalho de mostrar o app tirava a janela do maximizado. Causa: a função "desminimizar" do Tauri, chamada numa janela que não estava minimizada, faz o Windows "restaurar" o tamanho. | Testar o caminho **feliz e o estado de partida** (maximizado, minimizado, na bandeja). Chamar só o que é preciso: desminimizar só quando está minimizada. |
 
 ## Arquivos desta pasta
 

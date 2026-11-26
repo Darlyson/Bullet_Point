@@ -10,7 +10,7 @@ Lista viva: marque com `[x]` o que terminar e mova para `VERSOES.md`. A ordem é
 ## Em seguida (roteiro do README)
 
 - [x] **Filtro global por tópico** (0.1.4).
-- [ ] **Desktop**: atalhos globais e ícone na bandeja do sistema.
+- [x] **Desktop**: atalhos globais e ícone na bandeja do sistema (0.1.5).
 - [ ] **Google Calendar**: eventos do diário ↔ calendário.
 - [ ] **Sincronização em nuvem** (Supabase) entre PC e celular.
 - [ ] **Android** (Capacitor) + Health Connect para smart band (sono, passos, batimentos). Fica por último: ainda não há smart band.
@@ -18,4 +18,6 @@ Lista viva: marque com `[x]` o que terminar e mova para `VERSOES.md`. A ordem é
 ## Ideias soltas
 
 - [ ] Diminuir o tamanho do código carregado ao abrir (o build avisa que o pacote principal passa de 500 kB; os gráficos podem carregar só quando a janela de Gráficos abrir).
+- [ ] Abrir junto com o Windows (já escondido na bandeja), com opção de ligar/desligar.
+- [ ] Deixar trocar as teclas dos atalhos globais.
 - [ ] Atualização automática do app instalado, para não precisar rodar o instalador a cada versão.

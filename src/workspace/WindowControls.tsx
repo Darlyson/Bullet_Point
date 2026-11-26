@@ -46,7 +46,7 @@ export default function WindowControls() {
       <button onClick={run('toggleMaximize')} title={maximized ? 'Restaurar' : 'Maximizar'} aria-label={maximized ? 'Restaurar' : 'Maximizar'}>
         {maximized ? '❐' : '□'}
       </button>
-      <button className="close" onClick={run('close')} title="Fechar" aria-label="Fechar">
+      <button className="close" onClick={run('close')} title="Fechar (o app continua no ícone da bandeja; para sair de vez: botão direito no ícone → Sair)" aria-label="Fechar">
         ✕
       </button>
     </div>
