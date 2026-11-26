@@ -80,6 +80,12 @@ h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing
 .tab.active { background: var(--surface-3); border-color: var(--border-strong); color: var(--text); }
 .spacer { flex: 1; align-self: stretch; }
 
+/* Filtro global por tópico (barra de cima) */
+.topic-filter { display: flex; align-items: center; gap: 6px; border: 1px solid transparent; border-radius: 999px; padding: 0 4px 0 8px; }
+.topic-filter select { border: 0; background: transparent; font-size: 13px; padding: 3px 2px; }
+.topic-filter.on { background: var(--surface-2); }
+.topic-filter.on select { color: var(--text); font-weight: 600; }
+
 /* Minimizar / maximizar / fechar (app desktop sem a barra do Windows). */
 .win-controls { display: flex; align-self: stretch; margin: -8px -12px -8px 4px; }
 .win-controls button {
@@ -198,6 +204,8 @@ h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing
 ul.plain { list-style: none; margin: 0; padding: 0; }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .dot.lg { width: 11px; height: 11px; }
+button.tag { cursor: pointer; font: inherit; font-size: 11px; line-height: 1.6; }
+button.tag:hover, .tag.active { color: var(--text); border-color: var(--border-strong); }
 .tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border); padding: 0 7px; border-radius: 999px; white-space: nowrap; }
 .banner { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px; border-radius: 8px; background: rgba(250, 178, 25, 0.1); border: 1px solid rgba(250, 178, 25, 0.35); font-size: 13px; }
 
@@ -273,6 +281,7 @@ tr:hover .habit-name .icon-btn { opacity: 1; }
 .insights .info .ins-icon { color: var(--accent); }
 
 /* ---------- tópicos ---------- */
+.topic-card.active { background: var(--surface-3); }
 .topic-card { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); margin-bottom: 6px; }
 .inline-input { background: transparent; border-color: transparent; font-weight: 600; padding: 2px 4px; }
 .inline-input:hover { border-color: var(--border); }

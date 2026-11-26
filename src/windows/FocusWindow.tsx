@@ -1,15 +1,28 @@
+import { useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { formatDuration, formatMinutes, toISODate } from '../lib/date'
 import { useFocus } from '../focus/FocusContext'
 import { TopicSelect, TopicTag, useTopics } from '../components/topics'
+import { inTopic, useTopicFilter } from '../topics/context'
 
 export default function FocusWindow() {
   const { state, elapsed, remaining, update, start, pause, finish, discard } = useFocus()
   const { byId } = useTopics()
   const today = toISODate()
-  const sessions = useLiveQuery(() => db.focusSessions.where('date').equals(today).reverse().sortBy('startedAt'), [today])
+  const filter = useTopicFilter().topicId
+  const sessions = useLiveQuery(
+    async () =>
+      (await db.focusSessions.where('date').equals(today).reverse().sortBy('startedAt')).filter((s) => inTopic(s.topicId, filter)),
+    [today, filter],
+  )
   const idle = state.status === 'idle'
+
+  // Ligou o filtro global com o cronômetro parado: a próxima sessão já vem nesse tópico.
+  useEffect(() => {
+    if (filter && state.status === 'idle') update({ topicId: filter })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só quando o filtro muda
+  }, [filter])
 
   function onStart() {
     if ('Notification' in window && Notification.permission === 'default') void Notification.requestPermission()
@@ -90,7 +103,9 @@ export default function FocusWindow() {
             </li>
           ))}
         </ul>
-        {sessions?.length === 0 && <p className="muted">Nenhuma sessão ainda hoje.</p>}
+        {sessions?.length === 0 && (
+          <p className="muted">{filter ? 'Nenhuma sessão deste tópico hoje.' : 'Nenhuma sessão ainda hoje.'}</p>
+        )}
       </section>
     </div>
   )

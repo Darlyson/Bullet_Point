@@ -3,18 +3,21 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { uid } from '../lib/date'
 import { TopicSelect, useTopics } from '../components/topics'
+import { inTopic, useTopicFilter } from '../topics/context'
 import type { WindowProps } from './types'
 
 export default function NotesWindow({ win, setConfig }: WindowProps) {
   const noteId = (win.config?.noteId as string) ?? ''
-  const filter = (win.config?.topicId as string) ?? ''
+  const global = useTopicFilter().topicId
+  // O filtro global (barra de cima) tem prioridade sobre o filtro desta janela.
+  const filter = global || ((win.config?.topicId as string) ?? '')
   const [search, setSearch] = useState('')
   const { byId } = useTopics()
 
   const notes = useLiveQuery(() => db.notes.orderBy('updatedAt').reverse().toArray(), []) ?? []
   const visible = notes.filter(
     (n) =>
-      (!filter || n.topicId === filter) &&
+      inTopic(n.topicId, filter) &&
       (!search || (n.title + ' ' + n.content).toLowerCase().includes(search.toLowerCase())),
   )
   const current = notes.find((n) => n.id === noteId)
@@ -55,7 +58,13 @@ export default function NotesWindow({ win, setConfig }: WindowProps) {
           <button onClick={create}>+ Nota</button>
         </div>
         <input placeholder="Buscar…" value={search} onChange={(e) => setSearch(e.target.value)} />
-        <TopicSelect allowAll value={filter} onChange={(v) => setConfig({ topicId: v })} />
+        <TopicSelect
+          allowAll
+          value={filter}
+          disabled={!!global}
+          title={global ? 'Filtro global ativo (barra de cima)' : 'Filtrar esta janela'}
+          onChange={(v) => setConfig({ topicId: v })}
+        />
         <ul className="plain">
           {visible.map((n) => {
             const t = n.topicId ? byId.get(n.topicId) : undefined

@@ -3,6 +3,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { db } from '../db/db'
 import { addDays, dateShort, formatMinutes, lastNDays } from '../lib/date'
 import { CHART, NEUTRAL } from '../lib/palette'
+import { inTopic, useTopicFilter } from '../topics/context'
 import type { WindowProps } from './types'
 
 const RANGES = [7, 30, 90]
@@ -14,18 +15,25 @@ interface Insight {
 
 export default function StatsWindow({ win, setConfig }: WindowProps) {
   const range = (win.config?.range as number) ?? 30
+  const filter = useTopicFilter().topicId
 
   const data = useLiveQuery(async () => {
     const days = lastNDays(range)
     const from = days[0]
     const prevFrom = addDays(from, -range)
-    const [topics, habits, logs, bullets, sessions] = await Promise.all([
+    const [topics, allHabits, allLogs, allBullets, allSessions] = await Promise.all([
       db.topics.toArray(),
       db.habits.toArray(),
       db.habitLogs.where('date').aboveOrEqual(from).toArray(),
       db.bullets.where('date').aboveOrEqual(from).toArray(),
       db.focusSessions.where('date').aboveOrEqual(prevFrom).toArray(),
     ])
+    // Filtro global por tópico: tudo abaixo considera só o tópico escolhido.
+    const habits = allHabits.filter((h) => inTopic(h.topicId, filter))
+    const habitIds = new Set(habits.map((h) => h.id))
+    const logs = allLogs.filter((l) => habitIds.has(l.habitId))
+    const bullets = allBullets.filter((b) => inTopic(b.topicId, filter))
+    const sessions = allSessions.filter((s) => inTopic(s.topicId, filter))
 
     const cur = sessions.filter((s) => s.date >= from)
     const prev = sessions.filter((s) => s.date < from)
@@ -95,7 +103,7 @@ export default function StatsWindow({ win, setConfig }: WindowProps) {
       insights.push({ kind: 'info', text: `Maior parte do foco em "${topTopic.name}" (${Math.round((topTopic.sec / focusTotal) * 100)}%).` })
 
     return { perDay, focusTotal, focusPrev, topicRows, habitRows, tasks: t, taskTotal: tasks.length, insights }
-  }, [range])
+  }, [range, filter])
 
   if (!data) return null
   const maxTopic = data.topicRows[0]?.sec ?? 1
@@ -164,7 +172,7 @@ export default function StatsWindow({ win, setConfig }: WindowProps) {
         </div>
       </section>
 
-      {data.topicRows.length > 0 && (
+      {data.topicRows.length > 0 && !filter && (
         <section>
           <h4>Foco por tópico</h4>
           {data.topicRows.map((t) => (

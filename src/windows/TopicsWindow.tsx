@@ -3,10 +3,12 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { formatMinutes, lastNDays, uid } from '../lib/date'
 import { TOPIC_COLORS } from '../lib/palette'
+import { useTopicFilter } from '../topics/context'
 
 /** Tópicos ligam tudo: aqui você vê o que está vinculado a cada um. */
 export default function TopicsWindow() {
   const [name, setName] = useState('')
+  const filter = useTopicFilter()
 
   const data = useLiveQuery(async () => {
     const since = lastNDays(30)[0]
@@ -55,7 +57,11 @@ export default function TopicsWindow() {
 
       <ul className="plain topics">
         {data?.map(({ topic, habits, notes, openTasks, focusSec }) => (
-          <li key={topic.id} className="topic-card">
+          <li
+            key={topic.id}
+            className={`topic-card ${filter.topicId === topic.id ? 'active' : ''}`}
+            style={filter.topicId === topic.id ? { borderColor: topic.color } : undefined}
+          >
             <div className="row between">
               <strong className="row tight">
                 <span className="dot lg" style={{ background: topic.color }} />
@@ -78,6 +84,13 @@ export default function TopicsWindow() {
                     </option>
                   ))}
                 </select>
+                <button
+                  className={filter.topicId === topic.id ? 'chip active' : 'chip'}
+                  title={filter.topicId === topic.id ? 'Tirar o filtro' : 'Mostrar só este tópico em todas as janelas'}
+                  onClick={() => filter.toggle(topic.id)}
+                >
+                  {filter.topicId === topic.id ? '✓ Filtrando' : 'Filtrar'}
+                </button>
                 <button className="icon-btn ghost" title="Excluir tópico" onClick={() => remove(topic.id, topic.name)}>
                   ✕
                 </button>

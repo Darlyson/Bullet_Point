@@ -3,10 +3,12 @@ import { db } from '../db/db'
 import { dateLong, formatMinutes, toISODate } from '../lib/date'
 import { toggleHabit } from '../lib/actions'
 import { useFocus } from '../focus/FocusContext'
+import { inTopic, useTopicFilter } from '../topics/context'
 
 export default function TodayWindow() {
   const today = toISODate()
   const { elapsed, state } = useFocus()
+  const filter = useTopicFilter().topicId
 
   const data = useLiveQuery(async () => {
     const [habits, logs, bullets, sessions] = await Promise.all([
@@ -16,15 +18,16 @@ export default function TodayWindow() {
       db.focusSessions.where('date').equals(today).toArray(),
     ])
     return {
-      habits: habits.filter((h) => !h.archived),
+      habits: habits.filter((h) => !h.archived && inTopic(h.topicId, filter)),
       done: new Set(logs.map((l) => l.habitId)),
-      tasks: bullets.filter((b) => b.type === 'task'),
-      focusSec: sessions.reduce((a, s) => a + s.durationSec, 0),
+      tasks: bullets.filter((b) => b.type === 'task' && inTopic(b.topicId, filter)),
+      focusSec: sessions.filter((s) => inTopic(s.topicId, filter)).reduce((a, s) => a + s.durationSec, 0),
     }
-  }, [today])
+  }, [today, filter])
 
   if (!data) return null
-  const live = state.status !== 'idle' ? elapsed : 0
+  const live = state.status !== 'idle' && inTopic(state.topicId || undefined, filter) ? elapsed : 0
+  const habitsDone = data.habits.filter((h) => data.done.has(h.id)).length
   const tasksDone = data.tasks.filter((t) => t.status === 'done').length
   const openTasks = data.tasks.filter((t) => t.status === 'open')
 
@@ -38,7 +41,7 @@ export default function TodayWindow() {
         </div>
         <div className="tile">
           <div className="tile-value">
-            {data.done.size}/{data.habits.length}
+            {habitsDone}/{data.habits.length}
           </div>
           <div className="tile-label">hábitos</div>
         </div>

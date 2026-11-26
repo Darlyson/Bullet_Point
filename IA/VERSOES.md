@@ -8,6 +8,13 @@ Formato: a mudança mais recente fica no topo. Cada item diz o que mudou **para 
 
 (nada ainda)
 
+## 0.1.4 (2026-11-25)
+
+### Novo
+- **Filtro global por tópico.** Escolha um tópico na barra de cima e todas as janelas mostram só ele: Hábitos, Diário (inclusive o aviso de tarefas atrasadas), Notas, sessões de Foco, Hoje e Gráficos. Também dá para ligar clicando na etiqueta de um tópico em qualquer janela ou no botão "Filtrar" da janela Tópicos.
+- Com o filtro ligado, hábitos, tarefas, notas e sessões novas já nascem no tópico filtrado.
+- O filtro continua ligado ao reabrir o app. Se o tópico for excluído, o filtro sai sozinho.
+
 ## 0.1.3 (2026-11-25)
 
 ### Mudou

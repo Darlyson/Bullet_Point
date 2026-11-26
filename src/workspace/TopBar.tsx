@@ -6,6 +6,8 @@ import { useFocus } from '../focus/FocusContext'
 import { formatDuration } from '../lib/date'
 import { exportData, importData } from '../lib/backup'
 import WindowControls from './WindowControls'
+import { TopicSelect, useTopics } from '../components/topics'
+import { useTopicFilter } from '../topics/context'
 
 interface Props {
   workspaces: Workspace[]
@@ -17,6 +19,8 @@ export default function TopBar({ workspaces, active, onSelect }: Props) {
   const [menu, setMenu] = useState<'add' | 'data' | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const { state, elapsed, remaining } = useFocus()
+  const filter = useTopicFilter()
+  const filterTopic = useTopics().byId.get(filter.topicId)
 
   const hasWindow = (k: WindowKind) => active.windows.some((w) => w.kind === k)
 
@@ -89,6 +93,19 @@ export default function TopBar({ workspaces, active, onSelect }: Props) {
       </div>
 
       <div className="spacer" data-tauri-drag-region />
+
+      <div
+        className={`topic-filter ${filterTopic ? 'on' : ''}`}
+        style={filterTopic ? { borderColor: filterTopic.color } : undefined}
+      >
+        {filterTopic && <span className="dot" style={{ background: filterTopic.color }} />}
+        <TopicSelect allowAll value={filter.topicId} onChange={filter.setTopicId} title="Filtrar todas as janelas por tópico" />
+        {filterTopic && (
+          <button className="icon-btn ghost" title="Tirar o filtro" onClick={() => filter.setTopicId('')}>
+            ✕
+          </button>
+        )}
+      </div>
 
       {state.status !== 'idle' && (
         <div className={`mini-timer ${state.status}`} title={state.label}>

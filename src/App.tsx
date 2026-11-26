@@ -4,6 +4,7 @@ import { db } from './db/db'
 import { ensureDefaultWorkspaces } from './lib/workspaces'
 import { showDesktopWindow } from './lib/desktop'
 import { FocusProvider } from './focus/FocusContext'
+import { TopicFilterProvider } from './topics/TopicFilter'
 import TopBar from './workspace/TopBar'
 import WorkspaceCanvas from './workspace/WorkspaceCanvas'
 
@@ -34,11 +35,13 @@ export default function App() {
   const active = workspaces.find((w) => w.id === activeId) ?? workspaces[0]
 
   return (
-    <FocusProvider>
-      <div className="app">
-        <TopBar workspaces={workspaces} active={active} onSelect={setActiveId} />
-        <WorkspaceCanvas key={active.id} ws={active} />
-      </div>
-    </FocusProvider>
+    <TopicFilterProvider>
+      <FocusProvider>
+        <div className="app">
+          <TopBar workspaces={workspaces} active={active} onSelect={setActiveId} />
+          <WorkspaceCanvas key={active.id} ws={active} />
+        </div>
+      </FocusProvider>
+    </TopicFilterProvider>
   )
 }

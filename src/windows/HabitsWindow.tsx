@@ -5,16 +5,21 @@ import { lastNDays, toISODate, uid, weekdayShort } from '../lib/date'
 import { streak, toggleHabit } from '../lib/actions'
 import { TOPIC_COLORS } from '../lib/palette'
 import { TopicSelect, TopicTag, useTopics } from '../components/topics'
+import { inTopic, useTopicFilter } from '../topics/context'
 import type { WindowProps } from './types'
 
 export default function HabitsWindow({ win, setConfig }: WindowProps) {
-  const filter = (win.config?.topicId as string) ?? ''
+  const global = useTopicFilter().topicId
+  // O filtro global (barra de cima) tem prioridade sobre o filtro desta janela.
+  const filter = global || ((win.config?.topicId as string) ?? '')
   const { byId } = useTopics()
   const days = lastNDays(7)
   const today = toISODate()
 
   const [name, setName] = useState('')
-  const [topicId, setTopicId] = useState('')
+  // undefined = acompanha o filtro global
+  const [topicId, setTopicId] = useState<string>()
+  const newTopicId = topicId ?? global
   const [target, setTarget] = useState(7)
 
   const data = useLiveQuery(async () => {
@@ -31,12 +36,12 @@ export default function HabitsWindow({ win, setConfig }: WindowProps) {
   async function add(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim()) return
-    const topic = topicId ? byId.get(topicId) : undefined
+    const topic = newTopicId ? byId.get(newTopicId) : undefined
     const count = await db.habits.count()
     await db.habits.add({
       id: uid(),
       name: name.trim(),
-      topicId: topicId || undefined,
+      topicId: newTopicId || undefined,
       color: topic?.color ?? TOPIC_COLORS[count % TOPIC_COLORS.length],
       targetPerWeek: target,
       archived: false,
@@ -46,12 +51,18 @@ export default function HabitsWindow({ win, setConfig }: WindowProps) {
   }
 
   if (!data) return null
-  const habits = filter ? data.habits.filter((h) => h.topicId === filter) : data.habits
+  const habits = data.habits.filter((h) => inTopic(h.topicId, filter))
 
   return (
     <div className="stack">
       <div className="row">
-        <TopicSelect allowAll value={filter} onChange={(v) => setConfig({ topicId: v })} />
+        <TopicSelect
+          allowAll
+          value={filter}
+          disabled={!!global}
+          title={global ? 'Filtro global ativo (barra de cima)' : 'Filtrar esta janela'}
+          onChange={(v) => setConfig({ topicId: v })}
+        />
       </div>
 
       <table className="habit-grid">
@@ -104,11 +115,13 @@ export default function HabitsWindow({ win, setConfig }: WindowProps) {
           })}
         </tbody>
       </table>
-      {habits.length === 0 && <p className="muted">Nenhum hábito ainda. Crie o primeiro abaixo.</p>}
+      {habits.length === 0 && (
+        <p className="muted">{filter ? 'Nenhum hábito neste tópico.' : 'Nenhum hábito ainda. Crie o primeiro abaixo.'}</p>
+      )}
 
       <form className="row" onSubmit={add}>
         <input placeholder="Novo hábito (ex.: Ler 20 páginas)" value={name} onChange={(e) => setName(e.target.value)} />
-        <TopicSelect value={topicId} onChange={setTopicId} />
+        <TopicSelect value={newTopicId} onChange={setTopicId} />
         <select value={target} onChange={(e) => setTarget(Number(e.target.value))} title="Meta por semana">
           {[1, 2, 3, 4, 5, 6, 7].map((n) => (
             <option key={n} value={n}>

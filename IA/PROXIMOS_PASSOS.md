@@ -4,12 +4,12 @@ Lista viva: marque com `[x]` o que terminar e mova para `VERSOES.md`. A ordem é
 
 ## Agora
 
-- [ ] Instalar a 0.1.3 e testar: mover o app pela barra de cima (áreas vazias), tirar do maximizado, clique duplo, botões ─ □ ✕ e redimensionar pelas bordas.
+- [x] Instalar a 0.1.3 e testar o arraste do app (confirmado em 2026-11-25: funciona).
 - [ ] Se voltar a parar de responder: avisar **sem fechar o app**, para medir.
 
 ## Em seguida (roteiro do README)
 
-- [ ] **Filtro global por tópico**: clicar num tópico filtra todas as janelas.
+- [x] **Filtro global por tópico** (0.1.4).
 - [ ] **Desktop**: atalhos globais e ícone na bandeja do sistema.
 - [ ] **Google Calendar**: eventos do diário ↔ calendário.
 - [ ] **Sincronização em nuvem** (Supabase) entre PC e celular.

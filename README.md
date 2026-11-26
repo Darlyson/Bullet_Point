@@ -35,6 +35,8 @@ O app desktop precisa de [Rust](https://rustup.rs) e do Visual Studio com "Desen
 
 **Tópicos** ligam tudo: um hábito, uma tarefa, uma nota ou uma sessão de foco podem pertencer a um tópico, que mantém a mesma cor em todas as janelas e gráficos.
 
+**Filtro por tópico:** escolha um tópico no seletor da barra de cima (ou clique na etiqueta de um tópico em qualquer janela, ou em "Filtrar" na janela Tópicos) e **todas as janelas** passam a mostrar só ele: hábitos, diário, notas, sessões de foco, Hoje e Gráficos. O que você criar enquanto o filtro está ligado já nasce nesse tópico. ✕ tira o filtro.
+
 ## Estrutura
 
 ```
@@ -44,6 +46,7 @@ src-tauri/                 Casca desktop (Rust/Tauri): janela, ícone, instalado
 src/
   db/db.ts                 Modelo de dados + banco local (IndexedDB via Dexie)
   focus/FocusContext.tsx   Cronômetro global (continua rodando entre janelas)
+  topics/                  Filtro global por tópico (TopicFilter.tsx + context.ts)
   lib/
     workspaces.ts          Layouts padrão, adicionar/remover janelas
     actions.ts             Regras: marcar hábito, sequência, migrar tarefa
@@ -64,7 +67,7 @@ No modo dev, o banco fica acessível pelo console do navegador: `await db.habits
 ## Roteiro
 
 1. ✅ MVP: janelas encaixáveis, hábitos, diário, notas, foco + YouTube, gráficos, tópicos, backup
-2. ⬜ Filtro global por tópico (clicar num tópico filtra todas as janelas)
+2. ✅ Filtro global por tópico (clicar num tópico filtra todas as janelas)
 3. ✅ App desktop (Tauri): ícone, janela própria, instalador. ⬜ atalhos globais, bandeja do sistema
 4. ⬜ Google Calendar: eventos do diário ↔ calendário
 5. ⬜ Sincronização em nuvem (Supabase) entre PC e celular

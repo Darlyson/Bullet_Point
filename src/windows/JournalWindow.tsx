@@ -4,6 +4,7 @@ import { db, type Bullet, type BulletStatus, type BulletType } from '../db/db'
 import { addDays, dateLong, toISODate, uid } from '../lib/date'
 import { migrateBullet } from '../lib/actions'
 import { TopicSelect, TopicTag, useTopics } from '../components/topics'
+import { inTopic, useTopicFilter } from '../topics/context'
 import type { WindowProps } from './types'
 
 /** Símbolos clássicos do bullet journal */
@@ -37,16 +38,21 @@ export default function JournalWindow({ win, setConfig }: WindowProps) {
 
   const [text, setText] = useState('')
   const [type, setType] = useState<BulletType>('task')
-  const [topicId, setTopicId] = useState('')
+  const filter = useTopicFilter().topicId
+  // undefined = acompanha o filtro global
+  const [topicId, setTopicId] = useState<string>()
+  const newTopicId = topicId ?? filter
 
   const bullets = useLiveQuery(
-    () => db.bullets.where('date').equals(date).sortBy('createdAt'),
-    [date],
+    async () => (await db.bullets.where('date').equals(date).sortBy('createdAt')).filter((b) => inTopic(b.topicId, filter)),
+    [date, filter],
   )
   const overdue = useLiveQuery(
     async () =>
-      (await db.bullets.where('date').below(date).toArray()).filter((b) => b.type === 'task' && b.status === 'open'),
-    [date],
+      (await db.bullets.where('date').below(date).toArray()).filter(
+        (b) => b.type === 'task' && b.status === 'open' && inTopic(b.topicId, filter),
+      ),
+    [date, filter],
   )
 
   async function add(e: React.FormEvent) {
@@ -58,7 +64,7 @@ export default function JournalWindow({ win, setConfig }: WindowProps) {
       type,
       status: 'open',
       text: text.trim(),
-      topicId: topicId || undefined,
+      topicId: newTopicId || undefined,
       createdAt: Date.now(),
     })
     setText('')
@@ -115,7 +121,11 @@ export default function JournalWindow({ win, setConfig }: WindowProps) {
           </li>
         ))}
       </ul>
-      {bullets?.length === 0 && <p className="muted">Página em branco. Registre tarefas (•), eventos (○) e notas (–).</p>}
+      {bullets?.length === 0 && (
+        <p className="muted">
+          {filter ? 'Nada deste tópico neste dia.' : 'Página em branco. Registre tarefas (•), eventos (○) e notas (–).'}
+        </p>
+      )}
 
       <form className="row" onSubmit={add}>
         <select value={type} onChange={(e) => setType(e.target.value as BulletType)} title="Tipo">
@@ -124,7 +134,7 @@ export default function JournalWindow({ win, setConfig }: WindowProps) {
           <option value="note">– Nota</option>
         </select>
         <input placeholder="Escreva e tecle Enter" value={text} onChange={(e) => setText(e.target.value)} />
-        <TopicSelect value={topicId} onChange={setTopicId} />
+        <TopicSelect value={newTopicId} onChange={setTopicId} />
       </form>
     </div>
   )
