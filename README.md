@@ -22,6 +22,7 @@ O app desktop precisa de [Rust](https://rustup.rs) e do Visual Studio com "Desen
 
 ## Como usar
 
+- **Mover o app:** arraste pelas áreas vazias da barra de cima (o app não usa a barra de título do Windows). Clique duplo nela maximiza/restaura; ─ □ ✕ ficam no canto direito.
 - **Arrastar janela:** segure pelo título.
 - **Redimensionar:** pelas bordas (direita, esquerda, baixo) ou pelo canto inferior direito.
 - **Maximizar:** clique duplo no título (ou no botão □).

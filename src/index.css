@@ -78,7 +78,16 @@ h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing
 .tabs { display: flex; gap: 4px; }
 .tab { background: transparent; border-color: transparent; color: var(--text-2); }
 .tab.active { background: var(--surface-3); border-color: var(--border-strong); color: var(--text); }
-.spacer { flex: 1; }
+.spacer { flex: 1; align-self: stretch; }
+
+/* Minimizar / maximizar / fechar (app desktop sem a barra do Windows). */
+.win-controls { display: flex; align-self: stretch; margin: -8px -12px -8px 4px; }
+.win-controls button {
+  width: 46px; border: 0; border-radius: 0; background: transparent;
+  color: var(--text-2); font-size: 13px;
+}
+.win-controls button:hover { background: var(--surface-3); color: var(--text); }
+.win-controls button.close:hover { background: #c42b1c; color: #fff; }
 .chip { border-radius: 999px; padding: 4px 12px; font-size: 13px; }
 .chip.active { border-color: var(--accent); color: #fff; background: rgba(57, 135, 229, 0.18); }
 

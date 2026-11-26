@@ -5,6 +5,7 @@ import { WINDOW_TYPES } from '../windows/registry'
 import { useFocus } from '../focus/FocusContext'
 import { formatDuration } from '../lib/date'
 import { exportData, importData } from '../lib/backup'
+import WindowControls from './WindowControls'
 
 interface Props {
   workspaces: Workspace[]
@@ -56,11 +57,12 @@ export default function TopBar({ workspaces, active, onSelect }: Props) {
     }
   }
 
+  // Áreas com data-tauri-drag-region arrastam o app (clique duplo maximiza).
   return (
-    <nav className="topbar" onMouseLeave={() => setMenu(null)}>
-      <div className="brand">◆ Bullet Point</div>
+    <nav className="topbar" data-tauri-drag-region onMouseLeave={() => setMenu(null)}>
+      <div className="brand" data-tauri-drag-region>◆ Bullet Point</div>
       {import.meta.env.DEV && (
-        <span className="dev-badge" title="Versão de teste (npm run desktop / npm run dev). Os dados são separados do app instalado.">
+        <span className="dev-badge" data-tauri-drag-region title="Versão de teste (npm run desktop / npm run dev). Os dados são separados do app instalado.">
           TESTE
         </span>
       )}
@@ -86,7 +88,7 @@ export default function TopBar({ workspaces, active, onSelect }: Props) {
         </button>
       </div>
 
-      <div className="spacer" />
+      <div className="spacer" data-tauri-drag-region />
 
       {state.status !== 'idle' && (
         <div className={`mini-timer ${state.status}`} title={state.label}>
@@ -177,6 +179,8 @@ export default function TopBar({ workspaces, active, onSelect }: Props) {
           onChange={(e) => e.target.files?.[0] && doImport(e.target.files[0])}
         />
       </div>
+
+      <WindowControls />
     </nav>
   )
 }

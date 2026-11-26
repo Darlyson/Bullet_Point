@@ -4,8 +4,8 @@ Lista viva: marque com `[x]` o que terminar e mova para `VERSOES.md`. A ordem é
 
 ## Agora
 
-- [ ] Instalar a 0.1.1 e testar: arraste/redimensionamento das janelas no modo Livre e o app saindo do maximizado.
-- [ ] Se o app voltar a congelar ao sair do maximizado: avisar com o app aberto para ligar a medição.
+- [ ] Instalar a 0.1.3 e testar: mover o app pela barra de cima (áreas vazias), tirar do maximizado, clique duplo, botões ─ □ ✕ e redimensionar pelas bordas.
+- [ ] Se voltar a parar de responder: avisar **sem fechar o app**, para medir.
 
 ## Em seguida (roteiro do README)
 

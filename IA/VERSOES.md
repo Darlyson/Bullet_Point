@@ -8,6 +8,19 @@ Formato: a mudança mais recente fica no topo. Cada item diz o que mudou **para 
 
 (nada ainda)
 
+## 0.1.3 (2026-11-25)
+
+### Mudou
+- **O app não usa mais a barra de título do Windows.** A barra de cima do app faz esse papel: arraste pelas áreas vazias para mover, clique duplo para maximizar/restaurar, e os botões ─ □ ✕ ficam no canto direito. Redimensionar pelas bordas continua igual.
+
+### Corrigido
+- **Arrastar o app às vezes não funcionava.** Medido: depois de clicar dentro da página, o arraste pela barra do Windows falhava em 7 de 8 tentativas. Pela barra do app: 5 de 5, inclusive tirando do maximizado.
+
+## 0.1.2 (2026-11-25)
+
+### Corrigido
+- **O app parava de responder a cliques** depois de arrastar a barra de título (ex.: tirar do maximizado). O app continuava rodando, mas nada funcionava. Causa: o Windows ficava "segurando" o mouse na janela principal porque o "soltou o botão" se perdia entre a janela e a página (WebView2). Agora o app percebe isso em meio segundo e solta o mouse sozinho.
+
 ## 0.1.1 (2026-11-25)
 
 ### Novo
